@@ -1,0 +1,36 @@
+# Compila y pasa los tests en cada push. Existe para que el .jar que se publica
+# en una release no sea el que compilo alguien en su portatil: si el codigo del
+# repositorio no compila limpio, se ve aqui y no tres semanas despues.
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Java 21: la misma version contra la que se compila el plugin. Compilar
+      # con una superior generaria bytecode que no carga en el servidor del
+      # cliente, y eso se descubre el dia del lanzamiento.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - run: mvn -B clean package
+
+      # El artefacto queda disponible para descargar desde la propia ejecucion.
+      # Sirve para probar un cambio sin tener que publicar una release.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LatinosMC-jar
+          path: target/LatinosMC-*.jar
+          if-no-files-found: error

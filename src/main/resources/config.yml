@@ -1,0 +1,171 @@
+# =============================================================================
+# LatinosMC — configuración del plugin
+# =============================================================================
+
+plataforma:
+  # Clave que te dio el panel al registrar tu servidor.
+  # Solo se muestra UNA VEZ: si la pierdes, genera una nueva desde el panel.
+  # Trátala como una contraseña — quien la tenga puede recibir tus recompensas.
+  clave-api: PON_AQUI_TU_CLAVE
+
+  # Cada cuánto confirma el plugin que sigue vivo.
+  heartbeat-segundos: 60
+
+  # Cada cuánto pregunta por recompensas nuevas.
+  # 30 s es un buen equilibrio: el jugador nota su recompensa casi al instante
+  # sin castigar a la plataforma con consultas constantes.
+  sondeo-segundos: 30
+
+  lote-maximo: 50
+
+# =============================================================================
+# RECOMPENSAS
+# =============================================================================
+# La plataforma NUNCA envía comandos: envía un TIPO de recompensa. Tú decides
+# aquí qué comando ejecuta cada tipo.
+#
+# Esto no es una limitación, es la protección: si la plataforma pudiera mandar
+# texto de comando y alguien lograra colar algo raro en el nombre de un jugador,
+# se ejecutaría en TU servidor. Al mapearlo tú, eso es imposible.
+#
+# Los únicos valores que se sustituyen son {player} y {uuid}, y se validan
+# contra su gramática antes de usarse.
+#
+# ── UN SOLO COMANDO ──────────────────────────────────────────────────────────
+#
+#   recompensas:
+#     DEFAULT: "give {player} diamond 1"
+#
+# ── VARIOS COMANDOS ──────────────────────────────────────────────────────────
+#
+# Se ejecutan EN ORDEN, de arriba abajo, uno detrás de otro. Si uno falla, los
+# demás se ejecutan igual: un plugin que te falte no puede dejar al jugador sin
+# el resto de su recompensa.
+#
+#   recompensas:
+#     DEFAULT:
+#       - "give {player} diamond 1"
+#       - "eco give {player} 100"
+#       - "crate give {player} voto 1"
+#       - "broadcast &a{player} ha votado. &7¡Gracias!"
+#
+# Las dos formas valen. Si solo quieres un comando, no hace falta la lista.
+#
+# ── VARIOS TIPOS DE RECOMPENSA ───────────────────────────────────────────────
+#
+# DEFAULT es el tipo que manda la plataforma hoy. Puedes añadir más para cuando
+# haya recompensas especiales; una que no esté aquí no entrega nada y avisa en
+# la consola.
+#
+#   recompensas:
+#     DEFAULT:
+#       - "eco give {player} 100"
+#     PREMIUM:
+#       - "lp user {uuid} permission settemp vip.rango true 7d"
+#
+# Ojo: el comando va SIN la barra de delante. Se ejecuta desde la consola, no
+# desde el chat. Si la pones, el plugin la quita y te avisa.
+# =============================================================================
+recompensas:
+  DEFAULT:
+    - "give {player} diamond 1"
+
+
+# =============================================================================
+# VOTO
+# =============================================================================
+voto:
+  # Segundos que espera el plugin tras entregarte el código antes de buscar tu
+  # recompensa.
+  #
+  # Con esto NO hace falta escribir /votar dos veces. El plugin más extendido
+  # obliga a un segundo comando para reclamar el premio, se le olvida a mucha
+  # gente, y acaban pensando que el servidor no paga lo que promete.
+  #
+  # 60 segundos da margen de sobra para abrir el navegador y votar. Si lo bajas
+  # mucho, el jugador aún no habrá votado cuando se compruebe y tendrá que
+  # esperar al sondeo normal (sondeo-segundos, más arriba).
+  espera-segundos: 60
+
+# =============================================================================
+# MENSAJES
+# =============================================================================
+# Todo lo que ve el jugador se edita aquí. Nada está fijo en el plugin.
+#
+# El formato es MiniMessage: <green>texto</green>, <bold>, <gradient:...>.
+# Es lo que recomienda Paper y se lee mucho mejor que los códigos &a de antes.
+# Referencia: https://docs.advntr.dev/minimessage/format.html
+#
+# Sustituciones disponibles:
+#   {codigo}   el código de voto (K7M2-9QX4)
+#   {sitio}    la página donde se escribe el código (latinosmc.com/votar)
+#   {espera}   los segundos configurados arriba
+#   {restante} cuánto falta para poder votar ("6 horas y 42 minutos")
+#
+# Si borras una clave, vuelve el texto por defecto. Si la dejas como lista
+# vacía, no se envía nada.
+# =============================================================================
+mensajes:
+  preparando: "<gray>Preparando tu voto...</gray>"
+
+  # Cuando alguien repite /votar sin dejar respirar al anterior.
+  espera: "<gray>Un momento, que ya estoy en ello...</gray>"
+
+  # El bloque que ve quien SÍ puede pulsar enlaces (Java). El código va aquí
+  # igualmente: sirve para votar desde el móvil sin cerrar el juego.
+  #
+  # {sitio} es la página donde se escribe el código, ya completa
+  # (latinosmc.com/votar), no solo el dominio.
+  voto:
+    - ""
+    - "<green>¡Vota y llévate tu recompensa!</green>"
+    - "<gray>Si puedes pulsar enlaces:</gray>"
+    - ""
+    - "<gray>O entra en <white>{sitio}</white> y escribe este código:</gray>"
+    - "<aqua><bold>{codigo}</bold></aqua>"
+    - ""
+    - "<dark_gray>Tu recompensa llegará sola unos {espera} segundos después de votar.</dark_gray>"
+    - "<dark_gray>No hace falta que escribas nada más. El código caduca en 10 minutos.</dark_gray>"
+    - ""
+
+  boton: "  <aqua><bold>▶ PULSA AQUÍ PARA VOTAR</bold></aqua>"
+  boton-encima: "<gray>Abre el enlace en tu navegador</gray>"
+
+  # Lo que ven los jugadores de móvil y consola (Bedrock), que NO pueden pulsar
+  # enlaces en el chat de Minecraft. A ellos no se les enseña el botón: pulsarlo
+  # no hace nada y la conclusión sería que el servidor está roto.
+  #
+  # Escribir el código es su única forma de votar, así que aquí solo van los dos
+  # datos que necesitan: a dónde ir y qué escribir. No lo llenes de texto.
+  voto-bedrock:
+    - ""
+    - "<green>¡Vota y llévate tu recompensa!</green>"
+    - ""
+    - "<gray>1. Entra en <white><bold>{sitio}</bold></white></gray>"
+    - "<gray>2. Escribe este código:</gray>"
+    - ""
+    - "   <aqua><bold>{codigo}</bold></aqua>"
+    - ""
+    - "<dark_gray>Tu recompensa llega sola unos {espera} segundos después.</dark_gray>"
+    - "<dark_gray>El código caduca en 10 minutos.</dark_gray>"
+    - ""
+
+  # Ya votó hoy a algún servidor (si el ranking usa un voto diario global).
+  ya-voto-hoy: "<yellow>Ya has votado hoy.</yellow> <gray>Podrás volver a votar en {restante}.</gray>"
+
+  # Ya votó a ESTE servidor, pero podría votar a otro.
+  ya-voto-aqui: "<yellow>Ya votaste a este servidor.</yellow> <gray>Vuelve en {restante}.</gray>"
+
+  error: "<red>No se ha podido preparar tu voto ahora mismo. Inténtalo en un momento.</red>"
+
+# =============================================================================
+# AVANZADO — no toques esto salvo que sepas por qué
+# =============================================================================
+# La dirección de la plataforma viene fija en el plugin a propósito. Es una
+# medida de seguridad: si fuera configurable, alguien podría distribuir una
+# "guía de instalación" que apunte el plugin oficial a un servidor falso y se
+# quede con las claves de quien la siga.
+#
+# Solo se cambia para desarrollo o para una instancia propia.
+avanzado:
+  url-api: ""

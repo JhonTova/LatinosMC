@@ -1,0 +1,20 @@
+name: LatinosMC
+version: '${project.version}'
+main: com.latinosmc.plugin.LatinosMcPlugin
+api-version: '1.21'
+description: Entrega recompensas de los votos recibidos en LatinosMC.
+author: LatinosMC
+website: https://latinosmc.com
+
+commands:
+  votar:
+    description: Genera tu enlace personal para votar por el servidor.
+    usage: /votar
+    aliases: [votelmc, votarlmc]
+  vote:
+    description: Genera tu enlace personal para votar por el servidor.
+    usage: /vote
+
+# folia-supported: false
+# Se declara explicitamente cuando se pruebe en Folia. Marcarlo sin probarlo
+# provocaria corrupcion de estado en servidores con hilos por region.

@@ -1,0 +1,7 @@
+# Normalizado a LF en el repositorio. El .yml lo lee el servidor de Minecraft,
+# que suele ser Linux: un config.yml con finales de linea de Windows se lee
+# igual, pero los diffs quedan ilegibles en cuanto alguien lo edita desde otro
+# sistema.
+* text=auto eol=lf
+
+*.jar binary

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.latinosmc</groupId>
+  <artifactId>latinosmc-plugin</artifactId>
+  <version>0.1.0</version>
+  <packaging>jar</packaging>
+  <name>LatinosMC Plugin</name>
+
+  <!--
+    Proyecto independiente del backend a proposito: se compila contra la API de
+    Paper, se distribuye a terceros y sigue su propio ciclo de versiones.
+
+    Java 21 (ADR-0008): es la version que ejecutan los servidores de Minecraft
+    actuales. Compilar con un target superior haria que el plugin no cargara en
+    el servidor del cliente, y eso se descubre el dia del lanzamiento.
+  -->
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <paper.version>1.21.4-R0.1-SNAPSHOT</paper.version>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>papermc</id>
+      <url>https://repo.papermc.io/repository/maven-public/</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <!--
+      'provided': la API la aporta el servidor en tiempo de ejecucion. Empaquetarla
+      dentro del jar provocaria conflictos de clases con el propio servidor.
+
+      Nada se empaqueta dentro del jar: el cliente HTTP sale de la biblioteca
+      estandar y Gson lo trae el propio servidor. Cada dependencia empaquetada en
+      un plugin es un posible choque de versiones con los otros veinte plugins
+      del servidor.
+    -->
+    <dependency>
+      <groupId>io.papermc.paper</groupId>
+      <artifactId>paper-api</artifactId>
+      <version>${paper.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--
+      Gson se declara aunque llegue de rebote con paper-api. Una dependencia que
+      se usa sin declarar compila hoy y deja de compilar el dia que Paper
+      reorganice las suyas, sin que nada en este archivo explique por que.
+
+      Sigue siendo 'provided' porque la aporta el servidor: empaquetar una copia
+      seria exactamente el choque de versiones que se quiere evitar.
+    -->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.11.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.11.4</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>LatinosMC-${project.version}</finalName>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.3</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
