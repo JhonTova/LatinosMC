@@ -1,13 +1,32 @@
+# =============================================================================
+# Este repositorio es PUBLICO y solo contiene el plugin.
+# =============================================================================
+# La regla es al reves de lo habitual: se ignora todo por defecto y despues se
+# vuelve a permitir, una por una, las rutas que son del plugin.
+#
+# El motivo es que el plugin salio de un monorepo privado que ademas tiene el
+# backend, el frontend, los documentos internos y los .env. Con una lista de
+# exclusiones normal, copiar una carpeta por error o hacer "git add ." desde una
+# copia vieja del monorepo publicaria codigo privado y credenciales. Aqui eso no
+# puede pasar sin editar antes este archivo a proposito.
+#
+# Para añadir algo nuevo a la raiz del repositorio hay que añadir su linea "!"
+# aqui abajo.
+
+/*
+
+!/.gitattributes
+!/.github/
+!/.gitignore
+!/LICENSE
+!/README.md
+!/pom.xml
+!/src/
+
+# =============================================================================
+# Y dentro de lo permitido, lo que se genera al compilar nunca se sube
+# =============================================================================
 target/
 *.class
-
-.idea/
-*.iml
-.vscode/
-.settings/
-.classpath
-.project
-
+*.jar
 *.log
-.DS_Store
-Thumbs.db
