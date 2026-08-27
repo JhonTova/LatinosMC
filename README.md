@@ -21,7 +21,7 @@ Ese enlace abre la última publicación del plugin. Baja hasta el apartado
 
 ```
 ▾ Assets
-   LatinosMC-0.1.0.jar     ← este es el plugin
+   LatinosMC-0.2.0.jar     ← este es el plugin
    Source code (zip)
    Source code (tar.gz)
 ```
@@ -30,7 +30,8 @@ Es lo único que necesitas. Los dos `Source code` son el código fuente
 comprimido: no sirven para instalar, solo para leerlo o compilarlo.
 
 Si prefieres compilarlo tú mismo, está explicado en
-[Compilar desde el código](#compilar-desde-el-código).
+[Compilar desde el código](#compilar-desde-el-código). Lo que cambia en cada
+versión está en el [CHANGELOG](CHANGELOG.md).
 
 ---
 
