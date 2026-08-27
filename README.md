@@ -4,54 +4,88 @@ Plugin de Paper que entrega las recompensas de los votos que tu servidor recibe
 en [latinosmc.com](https://latinosmc.com).
 
 El jugador escribe `/votar`, recibe un enlace y un código, vota en la web, y la
-recompensa le llega sola al minuto. No hay segundo comando que reclamar.
+recompensa le llega sola al minuto. No hay un segundo comando que reclamar.
+
+[![build](https://github.com/JhonTova/LatinosMC/actions/workflows/build.yml/badge.svg)](https://github.com/JhonTova/LatinosMC/actions/workflows/build.yml)
+[![última versión](https://img.shields.io/github/v/release/JhonTova/LatinosMC?label=versi%C3%B3n)](https://github.com/JhonTova/LatinosMC/releases/latest)
+[![descargas](https://img.shields.io/github/downloads/JhonTova/LatinosMC/total?label=descargas)](https://github.com/JhonTova/LatinosMC/releases/latest)
+
+---
+
+## ⬇️ Descargar el plugin
+
+### **[→ Descargar la última versión](https://github.com/JhonTova/LatinosMC/releases/latest)**
+
+Ese enlace abre la última publicación del plugin. Baja hasta el apartado
+**Assets**, al final de la página, y descarga el archivo `LatinosMC-<versión>.jar`:
+
+```
+▾ Assets
+   LatinosMC-0.1.0.jar     ← este es el plugin
+   Source code (zip)
+   Source code (tar.gz)
+```
+
+Es lo único que necesitas. Los dos `Source code` son el código fuente
+comprimido: no sirven para instalar, solo para leerlo o compilarlo.
+
+Si prefieres compilarlo tú mismo, está explicado en
+[Compilar desde el código](#compilar-desde-el-código).
 
 ---
 
 ## Requisitos
 
-| | |
+| Necesitas | Versión |
 |---|---|
-| Servidor | Paper 1.21 o superior (o cualquier fork: Purpur, Pufferfish) |
+| Servidor | Paper 1.21 o superior (vale cualquier fork: Purpur, Pufferfish) |
 | Java | 21 |
 | Cuenta | Un servidor registrado en latinosmc.com, con su clave de API |
 
-Spigot y CraftBukkit no están soportados: el plugin usa la API de Adventure
-para los mensajes, y en Spigot no existe.
+Spigot y CraftBukkit no están soportados: el plugin usa la API de Adventure para
+los mensajes, y en Spigot esa API no existe.
 
-Folia todavía no. El plugin no declara `folia-supported` porque no se ha
-probado en un servidor con hilos por región, y declararlo sin probarlo
-provocaría corrupción de estado.
+Folia tampoco está soportado todavía. El plugin no declara `folia-supported`
+porque no se ha probado en un servidor con hilos por región, y declararlo sin
+probarlo provocaría corrupción de estado.
+
+---
 
 ## Instalación
 
-1. Descarga el `.jar` de la [última release](https://github.com/JhonTova/LatinosMC/releases/latest).
-2. Déjalo en la carpeta `plugins/` del servidor.
+1. Descarga el `.jar` desde la
+   [última release](https://github.com/JhonTova/LatinosMC/releases/latest)
+   (apartado **Assets**).
+2. Déjalo en la carpeta `plugins/` de tu servidor.
 3. Arranca el servidor una vez. Se genera `plugins/LatinosMC/config.yml` y el
    plugin se desactiva solo, avisando de que falta la clave.
-4. Abre el panel de latinosmc.com, registra el servidor y copia la clave de API.
-5. Pégala en `clave-api` dentro de `config.yml`.
+4. Abre el panel de latinosmc.com, registra tu servidor y copia la clave de API.
+5. Pégala en `clave-api`, dentro de `config.yml`.
 6. Reinicia el servidor.
 
 La clave se muestra una sola vez. Trátala como una contraseña: quien la tenga
 puede pedir los votos de tu servidor y quedarse con sus recompensas. Si la
 pierdes, genera una nueva desde el panel.
 
+---
+
 ## Comandos
 
 | Comando | Alias | Qué hace |
 |---|---|---|
 | `/votar` | `/votelmc`, `/votarlmc` | Genera el enlace y el código de voto del jugador |
-| `/vote` | | Lo mismo, para servidores con jugadores en inglés |
+| `/vote` | — | Lo mismo, para servidores con jugadores en inglés |
 
 El plugin no declara ningún nodo de permisos: los dos comandos los puede usar
-cualquiera, que es lo que se quiere. Para restringirlos hace falta un bloqueador
-de comandos externo, no basta con el gestor de permisos.
+cualquiera, que es justo lo que se busca. Para restringirlos hace falta un
+bloqueador de comandos externo; no basta con el gestor de permisos.
 
 Hay una espera de 3 segundos entre dos `/votar` del mismo jugador. No es por
 comodidad: cada ejecución pide un código a la plataforma, y la plataforma limita
-el tráfico por servidor. Un jugador aporreando el comando consumiría el cupo de
-todos los demás.
+el tráfico por servidor. Un jugador repitiendo el comando sin parar consumiría el
+cupo de todos los demás.
+
+---
 
 ## Configuración
 
@@ -60,8 +94,8 @@ línea; aquí queda solo el resumen.
 
 ### Recompensas
 
-Es la parte que hay que tocar sí o sí. La plataforma nunca manda comandos:
-manda un **tipo** de recompensa, y tú decides aquí qué ejecuta cada tipo.
+Es la parte que hay que tocar sí o sí. La plataforma nunca manda comandos: manda
+un **tipo** de recompensa, y tú decides aquí qué ejecuta cada tipo.
 
 ```yaml
 recompensas:
@@ -69,7 +103,7 @@ recompensas:
     - "give {player} diamond 1"
     - "eco give {player} 100"
     - "crate give {player} voto 1"
-    - "broadcast &a{player} ha votado. &7Gracias!"
+    - "broadcast &a{player} ha votado. &7¡Gracias!"
 ```
 
 Con un solo comando también vale la forma corta:
@@ -82,22 +116,23 @@ recompensas:
 Detalles que importan:
 
 - Los comandos se ejecutan **en orden**, de arriba abajo, desde la consola.
-- Van **sin la barra** de delante. Si la pones, el plugin la quita y lo avisa
-  en el log.
+- Van **sin la barra** delante. Si la pones, el plugin la quita y lo avisa en el
+  log.
 - Si uno falla, los demás se ejecutan igual. Que te falte un plugin no puede
   dejar al jugador sin el resto de su recompensa.
 - Las únicas sustituciones son `{player}` y `{uuid}`.
 - `DEFAULT` es el único tipo que manda la plataforma hoy. Puedes declarar más
   (`PREMIUM`, `NAVIDAD`) para cuando haya recompensas especiales. Un tipo que
-  llegue y no esté configurado no entrega nada y queda escrito en el log.
+  llegue y no esté configurado no entrega nada y queda anotado en el log.
 
 ### Mensajes
 
 Todo lo que ve el jugador se edita en la sección `mensajes`, en formato
-[MiniMessage](https://docs.advntr.dev/minimessage/format.html). Borrar una clave
-devuelve el texto por defecto; dejarla como lista vacía no envía nada.
+[MiniMessage](https://docs.advntr.dev/minimessage/format.html). Si borras una
+clave, se usa el texto por defecto; si la dejas como lista vacía, no se envía
+nada.
 
-Sustituciones disponibles: `{codigo}`, `{sitio}`, `{espera}`, `{restante}`.
+Sustituciones disponibles: `{codigo}`, `{sitio}`, `{espera}` y `{restante}`.
 
 ### Tiempos
 
@@ -112,7 +147,7 @@ voto:
 ```
 
 Los 60 segundos de `espera-segundos` dan margen de sobra para abrir el navegador
-y votar. Bajarlo mucho hace que el jugador aún no haya votado cuando se
+y votar. Bajarlo demasiado hace que el jugador todavía no haya votado cuando se
 compruebe, y tenga que esperar al sondeo normal.
 
 ---
@@ -128,19 +163,19 @@ ninguno de los dos se fía del otro.
 La consecuencia práctica es que **la plataforma nunca envía texto de comando**.
 Envía un identificador de tipo (`DEFAULT`) y el plugin lo busca en un mapa que
 escribió el dueño del servidor. Si la plataforma quedara comprometida, lo peor
-que puede hacer es entregar diamantes de más: no tiene ninguna vía para ejecutar
-algo arbitrario en tu consola.
+que podría hacer es entregar diamantes de más: no tiene ninguna vía para
+ejecutar algo arbitrario en tu consola.
 
 La segunda barrera es el nombre del jugador. Antes de sustituir `{player}` se
 valida contra `^[A-Za-z0-9_]{3,16}$`, y un nombre fuera de esa gramática cancela
 la entrega entera. Sin eso, un servidor en offline-mode con nombres libres sería
 una vía de inyección de comandos directa.
 
-La tercera es la dirección de la API, que va compilada dentro del `.jar`. Es
-configurable solo a través de `avanzado.url-api`, y usarlo deja dos avisos en el
+La tercera es la dirección de la API, que va compilada dentro del `.jar`. Solo
+se puede cambiar a través de `avanzado.url-api`, y usarlo deja dos avisos en el
 log de arranque. Si fuera un campo normal del `config.yml`, bastaría con
-publicar una "guía de instalación" apuntando a un servidor falso para recolectar
-las claves de quien la siguiera.
+publicar una "guía de instalación" que apuntara a un servidor falso para
+recolectar las claves de quien la siguiera.
 
 ### Identidad del jugador
 
@@ -166,8 +201,8 @@ Se conserva 90 días; pasado ese plazo se descarta y queda anotada en el log,
 porque el archivo no puede crecer para siempre.
 
 El mismo archivo guarda los identificadores ya aplicados. La plataforma puede
-reenviar una recompensa (es lo correcto: es preferible reenviar a perderla), y
-el plugin la reconoce y la confirma sin volver a ejecutar nada.
+reenviar una recompensa —es lo correcto: es preferible reenviar a perderla— y el
+plugin la reconoce y la confirma sin volver a ejecutar nada.
 
 Lo que no se pudo entregar vuelve a la lista de pendientes. El caso real es un
 tipo de recompensa que todavía no está en `config.yml`: descartarla la perdería
@@ -175,15 +210,17 @@ para siempre, porque a la plataforma ya se le confirmó.
 
 ### Jugadores de Bedrock
 
-A quien entra desde móvil o consola no se le enseña el botón de pulsar: en
+A quien entra desde móvil o consola no se le enseña el botón para pulsar: en
 Bedrock los enlaces del chat no funcionan, lo pulsarían, no pasaría nada y la
-conclusión sería que el servidor está roto. A ellos se les da el mensaje de
+conclusión sería que el servidor está roto. A ellos se les manda el mensaje de
 `voto-bedrock`, con dos datos y ninguno más: la página y el código.
 
-La detección mira los primeros ocho bytes del UUID, que Geyser deja a cero.
-No depende de Floodgate, así que el plugin sigue compilando y funcionando en un
+La detección mira los primeros ocho bytes del UUID, que Geyser deja a cero. No
+depende de Floodgate, así que el plugin sigue compilando y funcionando en un
 servidor que no tenga Geyser instalado. Equivocarse ahí no rompe nada: el peor
 caso es enseñar el mensaje que no tocaba, y el código aparece en los dos.
+
+---
 
 ## La API
 
@@ -199,7 +236,7 @@ Cuatro llamadas, todas autenticadas con la cabecera `X-Api-Key`, contra
 
 `/plugin/vote-tokens` recibe `{tipoIdentidad, identidad}` y responde con
 `{puedeVotar: true, token, url}` o, si el jugador ya votó, con
-`{puedeVotar: false, motivo, segundosRestantes}` donde `motivo` es
+`{puedeVotar: false, motivo, segundosRestantes}`, donde `motivo` es
 `YA_VOTO_HOY` o `YA_VOTO_AQUI`.
 
 El heartbeat y el sondeo corren en hilos asíncronos. Lo único que vuelve al hilo
@@ -208,7 +245,12 @@ recompensa van juntos en la misma tarea: si son tres comandos que dependen del
 anterior (crear la cuenta, ingresar, avisar), repartirlos en tareas distintas
 los dejaría a merced de lo que se cuele en medio.
 
+---
+
 ## Compilar desde el código
+
+Solo hace falta si quieres modificarlo. Para instalarlo basta con el `.jar` de
+la [última release](https://github.com/JhonTova/LatinosMC/releases/latest).
 
 ```bash
 git clone https://github.com/JhonTova/LatinosMC.git
@@ -216,7 +258,7 @@ cd LatinosMC
 mvn clean package
 ```
 
-El `.jar` sale en `target/LatinosMC-<version>.jar`.
+El `.jar` sale en `target/LatinosMC-<versión>.jar`.
 
 Nada se empaqueta dentro: `paper-api` y Gson van con alcance `provided` porque
 los aporta el servidor en tiempo de ejecución. Cada dependencia empaquetada en
@@ -224,7 +266,7 @@ un plugin es un posible choque de versiones con los otros veinte plugins del
 servidor.
 
 El `maven.compiler.release` está fijado a 21 a propósito. Compilar contra un
-target superior haría que el plugin no cargara en el servidor del cliente, y eso
+target superior haría que el plugin no cargase en el servidor del cliente, y eso
 se descubre el día del lanzamiento.
 
 ### Estructura del código
@@ -239,20 +281,22 @@ se descubre el día del lanzamiento.
 | `IdentidadDeJugador` | Las dos formas de identificar al votante |
 | `Mensajes` | Lectura de `config.yml` y formato MiniMessage |
 
-Los tests cubren las dos piezas donde un fallo silencioso cuesta dinero:
-la traducción de recompensa a comando y la persistencia de las pendientes.
+Los tests cubren las dos piezas donde un fallo silencioso cuesta dinero: la
+traducción de recompensa a comando y la persistencia de las pendientes.
 
 ```bash
 mvn test
 ```
 
+---
+
 ## Resolución de problemas
 
-**El plugin se desactiva al arrancar.** Falta la clave de API o sigue con el
+**El plugin se desactiva al arrancar.** Falta la clave de API, o sigue con el
 valor de ejemplo. El log lo dice explícitamente.
 
 **Los votos no dan nada.** Mira la sección `recompensas` de `config.yml`. Si en
-el arranque el log dice `Recompensas configuradas: 0`, no hay ninguna.
+el arranque el log dice `Recompensas configuradas: 0`, es que no hay ninguna.
 
 **"Recompensa de tipo X recibida pero no configurada".** Llegó un tipo que no
 está en tu `config.yml`. La recompensa no se pierde: queda pendiente y se
@@ -262,13 +306,15 @@ entrega en cuanto añadas el tipo y reinicies.
 tiene caracteres fuera de `A-Z a-z 0-9 _`, el plugin cancela la entrega y lo
 deja en el log con nivel `SEVERE`.
 
-**"Usando una direccion NO OFICIAL" en el log.** Alguien puso algo en
-`avanzado.url-api`. Si no fuiste tú, bórralo y cambia la clave de API desde el
+**"Usando una direccion NO OFICIAL" en el log.** Alguien ha puesto algo en
+`avanzado.url-api`. Si no has sido tú, bórralo y cambia la clave de API desde el
 panel.
 
-**Nada llega y el log no dice nada.** Sube el nivel de log a `FINE` para ver los
-heartbeats fallidos. Si el servidor no tiene salida a internet hacia
+**No llega nada y el log no dice nada.** Sube el nivel de log a `FINE` para ver
+los heartbeats fallidos. Si el servidor no tiene salida a internet hacia
 `api.latinosmc.com`, ese es el problema.
+
+---
 
 ## Licencia
 
