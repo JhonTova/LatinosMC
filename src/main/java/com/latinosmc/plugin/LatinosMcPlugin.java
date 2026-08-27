@@ -23,8 +23,17 @@ public final class LatinosMcPlugin extends JavaPlugin implements Listener {
 
     private ClienteApi api;
     private AlmacenDeEntregas almacen;
-    private EntregadorDeRecompensas entregador;
     private int loteMaximo;
+
+    /**
+     * Se reemplaza entero al recargar, desde el hilo principal, mientras el
+     * sondeo asincrono puede estar leyendolo. Volatil para que ese hilo vea el
+     * mapa nuevo y no una referencia rancia.
+     */
+    private volatile EntregadorDeRecompensas entregador;
+
+    /** Lo que se leyo al arrancar, para poder decir que ha cambiado desde entonces. */
+    private AjustesDeArranque ajustesDeArranque;
 
     @Override
     public void onEnable() {
@@ -41,6 +50,7 @@ public final class LatinosMcPlugin extends JavaPlugin implements Listener {
             return;
         }
 
+        this.ajustesDeArranque = ajustesEnDisco();
         this.api = new ClienteApi(url, clave, Duration.ofSeconds(10));
         this.almacen = new AlmacenDeEntregas(getDataFolder(), getLogger());
         this.almacen.cargar();
@@ -53,12 +63,17 @@ public final class LatinosMcPlugin extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
 
         boolean modoOffline = !getServer().getOnlineMode();
-        var comando = new ComandoVotar(this, api, new Mensajes(getConfig()), modoOffline);
+        var comando = new ComandoVotar(this, api, new Mensajes(this), modoOffline);
         for (String nombre : new String[] {"votar", "vote"}) {
             var registrado = getCommand(nombre);
             if (registrado != null) {
                 registrado.setExecutor(comando);
             }
+        }
+
+        var recarga = getCommand("lmcreload");
+        if (recarga != null) {
+            recarga.setExecutor(new ComandoRecargar(this));
         }
         if (modoOffline) {
             getLogger().info("Servidor en offline-mode: los votos se identifican por nombre.");
@@ -85,6 +100,50 @@ public final class LatinosMcPlugin extends JavaPlugin implements Listener {
         getLogger().warning("Usando una direccion NO OFICIAL: " + alternativa);
         getLogger().warning("Si no has configurado esto a proposito, borra 'avanzado.url-api' del config.yml.");
         return alternativa;
+    }
+
+    /**
+     * Lo que devuelve una recarga: cuanto se ha cargado y que se ha quedado sin
+     * aplicar.
+     */
+    public record Recarga(int tipos, int comandosDefault, List<String> avisos) {}
+
+    /**
+     * Relee config.yml y rehace el mapa de recompensas.
+     *
+     * <p>No toca el cliente de la API ni las tareas programadas. Rehacerlos en
+     * caliente significaria cortar el sondeo a mitad de un lote y volver a
+     * autenticarse con una clave que quiza este mal escrita, y el sintoma —votos
+     * que dejan de llegar— aparecerria mucho despues de la recarga, sin nada que
+     * lo relacione con ella. Lo que cambia de arranque se avisa y punto.
+     *
+     * <p>Los mensajes no hace falta recargarlos aqui: {@link Mensajes} lee de
+     * {@code getConfig()} en cada uso, asi que sigue solo al {@code reloadConfig()}.
+     *
+     * @throws RuntimeException si config.yml no se puede leer; en ese caso no se
+     *     ha tocado nada y sigue vigente lo que ya estaba cargado
+     */
+    public Recarga recargar() {
+        reloadConfig();
+
+        var nuevo = new EntregadorDeRecompensas(this, getConfig().getConfigurationSection("recompensas"), getLogger());
+        this.entregador = nuevo;
+
+        List<String> avisos = ajustesDeArranque.cambiosSinAplicar(ajustesEnDisco());
+
+        getLogger().info("Recarga: " + nuevo.tiposConfigurados() + " tipos de recompensa ("
+                + nuevo.comandosDe("DEFAULT") + " comandos en DEFAULT).");
+
+        return new Recarga(nuevo.tiposConfigurados(), nuevo.comandosDe("DEFAULT"), avisos);
+    }
+
+    private AjustesDeArranque ajustesEnDisco() {
+        return new AjustesDeArranque(
+                getConfig().getString("plataforma.clave-api", ""),
+                getConfig().getString("avanzado.url-api", ""),
+                getConfig().getInt("plataforma.heartbeat-segundos", 60),
+                getConfig().getInt("plataforma.sondeo-segundos", 30),
+                getConfig().getInt("plataforma.lote-maximo", 50));
     }
 
     private void programarTareas() {

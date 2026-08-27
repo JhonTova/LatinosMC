@@ -61,7 +61,8 @@ probarlo provocaría corrupción de estado.
    plugin se desactiva solo, avisando de que falta la clave.
 4. Abre el panel de latinosmc.com, registra tu servidor y copia la clave de API.
 5. Pégala en `clave-api`, dentro de `config.yml`.
-6. Reinicia el servidor.
+6. Reinicia el servidor. Tiene que ser un reinicio: la clave se lee al arrancar,
+   y `/lmcreload` no la recarga (ver [`/lmcreload`](#lmcreload-qué-recarga-y-qué-no)).
 
 La clave se muestra una sola vez. Trátala como una contraseña: quien la tenga
 puede pedir los votos de tu servidor y quedarse con sus recompensas. Si la
@@ -71,19 +72,57 @@ pierdes, genera una nueva desde el panel.
 
 ## Comandos
 
-| Comando | Alias | Qué hace |
-|---|---|---|
-| `/votar` | `/votelmc`, `/votarlmc` | Genera el enlace y el código de voto del jugador |
-| `/vote` | — | Lo mismo, para servidores con jugadores en inglés |
+| Comando | Alias | Permiso | Qué hace |
+|---|---|---|---|
+| `/votar` | `/votelmc`, `/votarlmc` | ninguno | Genera el enlace y el código de voto del jugador |
+| `/vote` | — | ninguno | Lo mismo, para servidores con jugadores en inglés |
+| `/lmcreload` | `/latinosmcreload`, `/lmcrecargar` | `latinosmc.reload` (op) | Recarga las recompensas y los mensajes |
 
-El plugin no declara ningún nodo de permisos: los dos comandos los puede usar
-cualquiera, que es justo lo que se busca. Para restringirlos hace falta un
-bloqueador de comandos externo; no basta con el gestor de permisos.
+`/votar` y `/vote` no declaran ningún permiso: los puede usar cualquiera, que es
+justo lo que se busca. Para restringirlos hace falta un bloqueador de comandos
+externo; no basta con el gestor de permisos.
 
 Hay una espera de 3 segundos entre dos `/votar` del mismo jugador. No es por
 comodidad: cada ejecución pide un código a la plataforma, y la plataforma limita
 el tráfico por servidor. Un jugador repitiendo el comando sin parar consumiría el
 cupo de todos los demás.
+
+### `/lmcreload`: qué recarga y qué no
+
+> **`/lmcreload` NO recarga la conexión con la plataforma.** Recarga las
+> recompensas y los mensajes. La clave de API, la dirección de la API y los
+> intervalos se leen **una sola vez, al arrancar el servidor**. Si has tocado
+> alguno de esos, **reinicia**: recargar no lo aplica.
+
+| En `config.yml` | ¿Lo aplica `/lmcreload`? |
+|---|---|
+| `recompensas:` (tipos y comandos) | ✅ Sí, al instante |
+| `mensajes:` (todo lo que ve el jugador) | ✅ Sí, al instante |
+| `voto.espera-segundos` | ✅ Sí, se lee en cada `/votar` |
+| `plataforma.clave-api` | ❌ No — hay que reiniciar |
+| `avanzado.url-api` | ❌ No — hay que reiniciar |
+| `plataforma.heartbeat-segundos` | ❌ No — hay que reiniciar |
+| `plataforma.sondeo-segundos` | ❌ No — hay que reiniciar |
+| `plataforma.lote-maximo` | ❌ No — hay que reiniciar |
+
+No hace falta que te acuerdes de esta tabla: el comando compara lo que hay en el
+archivo con lo que se cargó al arrancar y **te dice en rojo lo que has cambiado
+y no se ha aplicado**. Si no te avisa de nada, es que todo lo que tocaste ya
+está en marcha.
+
+La razón de que la conexión no se recargue no es pereza. Rehacer el cliente en
+caliente significa cortar el sondeo a mitad de un lote y volver a autenticarse
+con una clave que puede estar mal escrita. El síntoma —los votos dejan de
+llegar— aparecería mucho después, sin nada que lo relacionase con la recarga.
+
+**Caso especial: pusiste la clave después de arrancar el servidor.** Ahí
+`/lmcreload` no te vale, y no porque no quiera: si arrancas sin clave, el plugin
+**se desactiva solo**, y un plugin desactivado no atiende ningún comando. Pega la
+clave y reinicia.
+
+Si `config.yml` está mal escrito (la indentación suele ser la culpable), la
+recarga se cancela, te lo dice y **sigue funcionando la configuración anterior**:
+un archivo roto no puede dejarte sin entregar recompensas.
 
 ---
 
@@ -124,6 +163,7 @@ Detalles que importan:
 - `DEFAULT` es el único tipo que manda la plataforma hoy. Puedes declarar más
   (`PREMIUM`, `NAVIDAD`) para cuando haya recompensas especiales. Un tipo que
   llegue y no esté configurado no entrega nada y queda anotado en el log.
+- Al cambiarlas basta con `/lmcreload`; no hace falta reiniciar.
 
 ### Mensajes
 
@@ -280,6 +320,8 @@ se descubre el día del lanzamiento.
 | `AlmacenDeEntregas` | Persistencia de pendientes y de lo ya aplicado |
 | `IdentidadDeJugador` | Las dos formas de identificar al votante |
 | `Mensajes` | Lectura de `config.yml` y formato MiniMessage |
+| `ComandoRecargar` | `/lmcreload`: relee las recompensas y avisa de lo que no se aplica |
+| `AjustesDeArranque` | Los valores que solo se leen al arrancar, para poder comparar |
 
 Los tests cubren las dos piezas donde un fallo silencioso cuesta dinero: la
 traducción de recompensa a comando y la persistencia de las pendientes.
@@ -301,6 +343,10 @@ el arranque el log dice `Recompensas configuradas: 0`, es que no hay ninguna.
 **"Recompensa de tipo X recibida pero no configurada".** Llegó un tipo que no
 está en tu `config.yml`. La recompensa no se pierde: queda pendiente y se
 entrega en cuanto añadas el tipo y reinicies.
+
+**He cambiado la clave de API y sigue sin conectar.** `/lmcreload` no recarga la
+clave. Reinicia el servidor. Si al recargar te salió un aviso en rojo, era
+exactamente eso.
 
 **Un jugador vota y no recibe nada, pero otros sí.** Suele ser el nombre: si
 tiene caracteres fuera de `A-Z a-z 0-9 _`, el plugin cancela la entrega y lo

@@ -1,11 +1,25 @@
 # =============================================================================
 # LatinosMC — configuración del plugin
 # =============================================================================
+#
+# ¿HACE FALTA REINICIAR TRAS EDITAR ESTE ARCHIVO?
+#
+#   recompensas:  y  mensajes:  →  con /lmcreload basta.
+#   voto:                       →  con /lmcreload basta.
+#   plataforma:  y  avanzado:   →  HAY QUE REINICIAR el servidor.
+#
+# Todo lo que hay bajo `plataforma:` y `avanzado:` se lee una sola vez, al
+# arrancar: con ello se construye el cliente de la API y se programan las tareas.
+# /lmcreload NO los vuelve a leer, pero sí se da cuenta de que los has cambiado y
+# te avisa en rojo de que hace falta reiniciar. No te quedas a ciegas.
+# =============================================================================
 
 plataforma:
   # Clave que te dio el panel al registrar tu servidor.
   # Solo se muestra UNA VEZ: si la pierdes, genera una nueva desde el panel.
   # Trátala como una contraseña — quien la tenga puede recibir tus recompensas.
+  #
+  # OJO: se lee al arrancar. Si la cambias, reinicia; /lmcreload no la aplica.
   clave-api: PON_AQUI_TU_CLAVE
 
   # Cada cuánto confirma el plugin que sigue vivo.
@@ -65,6 +79,9 @@ plataforma:
 #
 # Ojo: el comando va SIN la barra de delante. Se ejecuta desde la consola, no
 # desde el chat. Si la pones, el plugin la quita y te avisa.
+#
+# Al cambiar esta sección basta con /lmcreload (permiso latinosmc.reload, de
+# operador). No hace falta reiniciar el servidor.
 # =============================================================================
 recompensas:
   DEFAULT:
@@ -104,6 +121,8 @@ voto:
 #
 # Si borras una clave, vuelve el texto por defecto. Si la dejas como lista
 # vacía, no se envía nada.
+#
+# Al igual que las recompensas, esta sección se aplica con /lmcreload.
 # =============================================================================
 mensajes:
   preparando: "<gray>Preparando tu voto...</gray>"
@@ -167,5 +186,7 @@ mensajes:
 # quede con las claves de quien la siga.
 #
 # Solo se cambia para desarrollo o para una instancia propia.
+#
+# Igual que la clave: se lee al arrancar. Si lo cambias, reinicia el servidor.
 avanzado:
   url-api: ""

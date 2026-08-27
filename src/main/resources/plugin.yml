@@ -14,6 +14,19 @@ commands:
   vote:
     description: Genera tu enlace personal para votar por el servidor.
     usage: /vote
+  lmcreload:
+    description: Recarga las recompensas y los mensajes de config.yml.
+    usage: /lmcreload
+    aliases: [latinosmcreload, lmcrecargar]
+    permission: latinosmc.reload
+
+# A diferencia de /votar, este SI lleva permiso y por defecto es de operador:
+# relee un archivo del disco y cambia que comandos ejecuta el servidor al
+# entregar una recompensa. No es cosa de jugadores.
+permissions:
+  latinosmc.reload:
+    description: Permite usar /lmcreload.
+    default: op
 
 # folia-supported: false
 # Se declara explicitamente cuando se pruebe en Folia. Marcarlo sin probarlo
